@@ -25,12 +25,10 @@
 
     <TextView
         android:id="@+id/main_start_end_button_text_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        style="@style/PrimaryButton"
+        android:textAppearance="@style/PrimaryButtonText"
         android:layout_marginTop="@dimen/medium_padding"
-        android:background="@drawable/selector_bg_primary_button"
-        android:fontFamily="@font/numans"
-        android:gravity="center"
+        android:clickable="true"
         android:text="Start"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -38,11 +36,11 @@
 
     <TextView
         android:id="@+id/main_cancel_button_text_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        style="@style/PrimaryButton"
+        android:textAppearance="@style/PrimaryButtonText"
         android:layout_marginTop="@dimen/medium_padding"
-        android:background="@drawable/selector_bg_primary_button"
         android:gravity="center"
+        android:clickable="true"
         android:text="Cancel"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/main_start_end_button_text_view" />
