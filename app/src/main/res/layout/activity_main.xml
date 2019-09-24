@@ -29,8 +29,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/medium_padding"
         android:background="@drawable/selector_bg_primary_button"
-        android:text="Start"
+        android:fontFamily="@font/numans"
         android:gravity="center"
+        android:text="Start"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/main_timer_text_view" />
