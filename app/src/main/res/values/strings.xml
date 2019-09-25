@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Table Hockey</string>
+    <string name="cancel">Cancel</string>
+    <string name="start">Start</string>
 </resources>

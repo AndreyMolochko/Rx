@@ -1,22 +1,37 @@
 package com.ostrovec.tablehockey.ui.main
 
+import android.media.MediaPlayer
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.CountDownTimer
+import android.util.Log
 import android.widget.TextView
 import com.ostrovec.tablehockey.R
 
 class MainActivity : AppCompatActivity() {
 
+    private val ONE_SECOND: Long = 1000
+    private val DEFAULT_TIME: String = "00:00"
+    private val SECONDS_IN_MINUTE: Int = 60
+    private var BEGIN_MOTIVATION_TIME: Long = 13L
+
     private lateinit var timerTextView: TextView
     private lateinit var startEndTextView: TextView
     private lateinit var cancelTextView: TextView
+
+    private lateinit var countDownTimer: CountDownTimer
+    private lateinit var descendingCountDownTimer: CountDownTimer
+
+    private lateinit var mediaPlayer: MediaPlayer
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_main)
+        mediaPlayer = MediaPlayer.create(this, R.raw.motivation)
         initViews()
         initListeners()
+        initCountDownTimers()
     }
 
     private fun initViews() {
@@ -27,12 +42,63 @@ class MainActivity : AppCompatActivity() {
 
     private fun initListeners() {
         startEndTextView.setOnClickListener {
-
+            descendingCountDownTimer.start()
         }
 
         cancelTextView.setOnClickListener {
-            
+            descendingCountDownTimer.cancel()
+            countDownTimer.onFinish()
+            countDownTimer.cancel()
+            timerTextView.text = DEFAULT_TIME
         }
+    }
+
+    private fun initCountDownTimers() {
+        countDownTimer = object : CountDownTimer(300 * ONE_SECOND, ONE_SECOND) {
+            override fun onFinish() {
+                Log.e("timeHockey", "finish")
+            }
+
+            override fun onTick(millisUntilFinished: Long) {
+                timerTextView.text = getTime(millisUntilFinished)
+            }
+
+        }
+
+        descendingCountDownTimer = object : CountDownTimer(16 * ONE_SECOND, ONE_SECOND) {
+            override fun onFinish() {
+                countDownTimer.start()
+            }
+
+            override fun onTick(millisUntilFinished: Long) {
+                if (convertMillisecondsInSeconds(millisUntilFinished) == BEGIN_MOTIVATION_TIME) {
+                    mediaPlayer.start()
+                }
+                timerTextView.text = getTime(millisUntilFinished)
+            }
+
+        }
+    }
+
+    private fun getTime(milliseconds: Long): String {
+        if (convertMillisecondsInSeconds(milliseconds) < 10) {
+            return "0" + convertMillisecondsInMinutes(milliseconds) + ":" +
+                    "0" + convertMillisecondsInSeconds(milliseconds)
+        } else {
+            return "0" + convertMillisecondsInMinutes(milliseconds) + ":" + convertMillisecondsInSeconds(milliseconds)
+        }
+    }
+
+    private fun convertMillisecondsInSeconds(milliseconds: Long): Long {
+        Log.e("timeHockey in secon = ", ((milliseconds % (SECONDS_IN_MINUTE * ONE_SECOND)) / ONE_SECOND)
+                .toString())
+
+        return (milliseconds % (SECONDS_IN_MINUTE * ONE_SECOND)) / ONE_SECOND
+    }
+
+    private fun convertMillisecondsInMinutes(milliseconds: Long): Long {
+        Log.e("timeHockey in minu = ", (milliseconds / 60).toString())
+        return milliseconds / (SECONDS_IN_MINUTE * ONE_SECOND)
     }
 
 
