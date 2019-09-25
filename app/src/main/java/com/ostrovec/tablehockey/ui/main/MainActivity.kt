@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.util.Log
+import android.view.WindowManager
 import android.widget.TextView
 import com.ostrovec.tablehockey.R
 
@@ -25,17 +26,24 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mediaPlayerMotivation: MediaPlayer
     private lateinit var mediaPlayerSiren: MediaPlayer
     private lateinit var mediaPlayerSignal: MediaPlayer
+    private lateinit var mediaPlayerFinalSong: MediaPlayer
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_main)
-        mediaPlayerMotivation = MediaPlayer.create(this, R.raw.motivation)
-        mediaPlayerSiren = MediaPlayer.create(this, R.raw.sirena)
-        mediaPlayerSignal = MediaPlayer.create(this,R.raw.intermediate_signal)
+        initMediaPlayers()
         initViews()
         initListeners()
         initCountDownTimers()
+        keepScreenOn()
+    }
+
+    private fun initMediaPlayers() {
+        mediaPlayerMotivation = MediaPlayer.create(this, R.raw.motivation)
+        mediaPlayerSiren = MediaPlayer.create(this, R.raw.sirena)
+        mediaPlayerSignal = MediaPlayer.create(this, R.raw.intermediate_signal)
+        mediaPlayerFinalSong = MediaPlayer.create(this, R.raw.final_song)
     }
 
     private fun initViews() {
@@ -62,11 +70,17 @@ class MainActivity : AppCompatActivity() {
         countDownTimer = object : CountDownTimer(300 * ONE_SECOND, ONE_SECOND) {
             override fun onFinish() {
                 mediaPlayerSiren.start()
+                timerTextView.text = DEFAULT_TIME
             }
 
             override fun onTick(millisUntilFinished: Long) {
-                if(convertMillisecondsInSeconds(millisUntilFinished)==0L){
+                if (convertMillisecondsInSeconds(millisUntilFinished) == 0L) {
                     mediaPlayerSignal.start()
+                }
+                if (convertMillisecondsInMinutes(millisUntilFinished) == 0L &&
+                        convertMillisecondsInSeconds(millisUntilFinished) == 30L) {
+                    mediaPlayerFinalSong.start()
+                    Log.e("final","final")
                 }
                 timerTextView.text = getTime(millisUntilFinished)
             }
@@ -110,13 +124,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updatePlayers() {
-        mediaPlayerSiren.pause()
-        mediaPlayerSiren.seekTo(0)
-        mediaPlayerMotivation.pause()
-        mediaPlayerMotivation.seekTo(0)
-        mediaPlayerSignal.pause()
-        mediaPlayerSignal.seekTo(0)
+        updatePlayer(mediaPlayerSiren)
+        updatePlayer(mediaPlayerMotivation)
+        updatePlayer(mediaPlayerSignal)
+        updatePlayer(mediaPlayerFinalSong)
     }
 
+    private fun updatePlayer(mediaPlayer: MediaPlayer) {
+        mediaPlayer.pause()
+        mediaPlayer.seekTo(0)
+    }
 
+    private fun keepScreenOn(){
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+    }
 }
