@@ -24,6 +24,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var mediaPlayerMotivation: MediaPlayer
     private lateinit var mediaPlayerSiren: MediaPlayer
+    private lateinit var mediaPlayerSignal: MediaPlayer
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,6 +32,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         mediaPlayerMotivation = MediaPlayer.create(this, R.raw.motivation)
         mediaPlayerSiren = MediaPlayer.create(this, R.raw.sirena)
+        mediaPlayerSignal = MediaPlayer.create(this,R.raw.intermediate_signal)
         initViews()
         initListeners()
         initCountDownTimers()
@@ -63,6 +65,9 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onTick(millisUntilFinished: Long) {
+                if(convertMillisecondsInSeconds(millisUntilFinished)==0L){
+                    mediaPlayerSignal.start()
+                }
                 timerTextView.text = getTime(millisUntilFinished)
             }
 
@@ -104,11 +109,13 @@ class MainActivity : AppCompatActivity() {
         return milliseconds / (SECONDS_IN_MINUTE * ONE_SECOND)
     }
 
-    private fun updatePlayers(){
+    private fun updatePlayers() {
         mediaPlayerSiren.pause()
         mediaPlayerSiren.seekTo(0)
         mediaPlayerMotivation.pause()
         mediaPlayerMotivation.seekTo(0)
+        mediaPlayerSignal.pause()
+        mediaPlayerSignal.seekTo(0)
     }
 
 
