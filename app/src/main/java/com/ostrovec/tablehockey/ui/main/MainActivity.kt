@@ -22,13 +22,15 @@ class MainActivity : AppCompatActivity() {
     private lateinit var countDownTimer: CountDownTimer
     private lateinit var descendingCountDownTimer: CountDownTimer
 
-    private lateinit var mediaPlayer: MediaPlayer
+    private lateinit var mediaPlayerMotivation: MediaPlayer
+    private lateinit var mediaPlayerSiren: MediaPlayer
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_main)
-        mediaPlayer = MediaPlayer.create(this, R.raw.motivation)
+        mediaPlayerMotivation = MediaPlayer.create(this, R.raw.motivation)
+        mediaPlayerSiren = MediaPlayer.create(this, R.raw.sirena)
         initViews()
         initListeners()
         initCountDownTimers()
@@ -50,13 +52,14 @@ class MainActivity : AppCompatActivity() {
             countDownTimer.onFinish()
             countDownTimer.cancel()
             timerTextView.text = DEFAULT_TIME
+            updatePlayers()
         }
     }
 
     private fun initCountDownTimers() {
         countDownTimer = object : CountDownTimer(300 * ONE_SECOND, ONE_SECOND) {
             override fun onFinish() {
-                Log.e("timeHockey", "finish")
+                mediaPlayerSiren.start()
             }
 
             override fun onTick(millisUntilFinished: Long) {
@@ -72,7 +75,7 @@ class MainActivity : AppCompatActivity() {
 
             override fun onTick(millisUntilFinished: Long) {
                 if (convertMillisecondsInSeconds(millisUntilFinished) == BEGIN_MOTIVATION_TIME) {
-                    mediaPlayer.start()
+                    mediaPlayerMotivation.start()
                 }
                 timerTextView.text = getTime(millisUntilFinished)
             }
@@ -97,8 +100,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun convertMillisecondsInMinutes(milliseconds: Long): Long {
-        Log.e("timeHockey in minu = ", (milliseconds / 60).toString())
+        Log.e("timeHockey in minu = ", (milliseconds / SECONDS_IN_MINUTE).toString())
         return milliseconds / (SECONDS_IN_MINUTE * ONE_SECOND)
+    }
+
+    private fun updatePlayers(){
+        mediaPlayerSiren.pause()
+        mediaPlayerSiren.seekTo(0)
+        mediaPlayerMotivation.pause()
+        mediaPlayerMotivation.seekTo(0)
     }
 
 
