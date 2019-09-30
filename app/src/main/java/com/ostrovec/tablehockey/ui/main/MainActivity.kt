@@ -10,6 +10,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Action
+import io.reactivex.functions.Function
 import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.Callable
 import java.util.concurrent.TimeUnit
@@ -18,11 +19,14 @@ class MainActivity : AppCompatActivity() {
 
     private var compositeDisposable: CompositeDisposable = CompositeDisposable()
     private var TAG = "SecondLesson"
-    var observable: Observable<Long> = Observable.fromCallable (CallableGetSum(4,6) )
+    var observable: Observable<String> = Observable.fromArray(4L,5L,6L,7L,8L)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
+            .map{
+                longToString(it)
+            }
 
-    var observer: Observer<Long> = object : Observer<Long> {
+    var observer: Observer<String> = object : Observer<String> {
         override fun onSubscribe(d: Disposable) {
             Log.e(TAG, "onSubscribe")
             compositeDisposable.add(d)
@@ -32,9 +36,9 @@ class MainActivity : AppCompatActivity() {
             Log.e(TAG, "onComplete")
         }
 
-        override fun onNext(t: Long) {
+        override fun onNext(t: String) {
             Log.e(TAG, "onNext")
-            Log.e(TAG, t.toString())
+            Log.e(TAG, t)
         }
 
         override fun onError(e: Throwable) {
@@ -52,15 +56,7 @@ class MainActivity : AppCompatActivity() {
         observable.subscribe(observer)
     }
 
-    class CallableGetSum(var a:Long, var b: Long) : Callable<Long>{
-
-        fun getSum(a: Long, b: Long): Long {
-            return a + b
-        }
-
-        override fun call(): Long {
-            return getSum(a, b)
-        }
-
+    fun longToString(number:Long):String{
+        return number.toString()
     }
 }
