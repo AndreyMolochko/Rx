@@ -21,23 +21,4 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/main_start_end_button_text_view"
-        style="@style/PrimaryButton"
-        android:layout_marginTop="@dimen/medium_padding"
-        android:text="@string/start"
-        android:textAppearance="@style/PrimaryButtonText"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/main_timer_text_view" />
-
-    <TextView
-        android:id="@+id/main_cancel_button_text_view"
-        style="@style/PrimaryButton"
-        android:layout_marginTop="@dimen/medium_padding"
-        android:text="@string/cancel"
-        android:textAppearance="@style/PrimaryButtonText"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/main_start_end_button_text_view" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>
