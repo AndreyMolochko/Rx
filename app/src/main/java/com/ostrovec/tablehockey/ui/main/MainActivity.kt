@@ -19,14 +19,14 @@ class MainActivity : AppCompatActivity() {
 
     private var compositeDisposable: CompositeDisposable = CompositeDisposable()
     private var TAG = "SecondLesson"
-    var observable: Observable<String> = Observable.fromArray(4L,5L,6L,7L,8L)
+    var observable: Observable<List<String>> = Observable.fromArray(4L,5L,6L,7L,8L)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .map{
                 longToString(it)
-            }
+            }.buffer(2)
 
-    var observer: Observer<String> = object : Observer<String> {
+    var observer: Observer<List<String>> = object : Observer<List<String>> {
         override fun onSubscribe(d: Disposable) {
             Log.e(TAG, "onSubscribe")
             compositeDisposable.add(d)
@@ -36,9 +36,9 @@ class MainActivity : AppCompatActivity() {
             Log.e(TAG, "onComplete")
         }
 
-        override fun onNext(t: String) {
+        override fun onNext(t: List<String>) {
             Log.e(TAG, "onNext")
-            Log.e(TAG, t)
+            Log.e(TAG, t.toString())
         }
 
         override fun onError(e: Throwable) {
