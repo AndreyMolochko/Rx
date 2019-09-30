@@ -6,15 +6,21 @@ import androidx.appcompat.app.AppCompatActivity
 import com.ostrovec.tablehockey.R
 import io.reactivex.Observable
 import io.reactivex.Observer
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
+import io.reactivex.functions.Action
+import io.reactivex.schedulers.Schedulers
+import java.util.concurrent.Callable
 import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
 
     private var compositeDisposable: CompositeDisposable = CompositeDisposable()
     private var TAG = "SecondLesson"
-    var observable: Observable<Long> = Observable.interval(400,TimeUnit.MILLISECONDS)
+    var observable: Observable<Long> = Observable.fromCallable (CallableGetSum(4,6) )
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
 
     var observer: Observer<Long> = object : Observer<Long> {
         override fun onSubscribe(d: Disposable) {
@@ -44,5 +50,17 @@ class MainActivity : AppCompatActivity() {
 
 
         observable.subscribe(observer)
+    }
+
+    class CallableGetSum(var a:Long, var b: Long) : Callable<Long>{
+
+        fun getSum(a: Long, b: Long): Long {
+            return a + b
+        }
+
+        override fun call(): Long {
+            return getSum(a, b)
+        }
+
     }
 }
