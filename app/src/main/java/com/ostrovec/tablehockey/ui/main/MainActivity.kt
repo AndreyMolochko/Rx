@@ -13,22 +13,21 @@ class MainActivity : AppCompatActivity() {
 
     private var compositeDisposable: CompositeDisposable = CompositeDisposable()
     private var TAG = "SecondLesson"
-    var observable: Observable<String> = Observable.fromArray("first", "second", "third")
+    var observable: Observable<Int> = Observable.range(0,100)
 
-    var observer: Observer<String> = object : Observer<String> {
+    var observer: Observer<Int> = object : Observer<Int> {
         override fun onSubscribe(d: Disposable) {
-            Log.e(TAG, "onNext")
+            Log.e(TAG, "onSubscribe")
             compositeDisposable.add(d)
         }
 
         override fun onComplete() {
             Log.e(TAG, "onComplete")
-
         }
 
-        override fun onNext(t: String) {
+        override fun onNext(t: Int) {
             Log.e(TAG, "onNext")
-            Log.e(TAG, t)
+            Log.e(TAG, t.toString())
         }
 
         override fun onError(e: Throwable) {
