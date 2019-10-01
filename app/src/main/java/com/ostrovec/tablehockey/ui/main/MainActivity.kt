@@ -1,6 +1,7 @@
 package com.ostrovec.tablehockey.ui.main
 
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.ostrovec.tablehockey.R
@@ -11,6 +12,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Action
 import io.reactivex.functions.Function
+import io.reactivex.observables.ConnectableObservable
 import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.Callable
 import java.util.concurrent.TimeUnit
@@ -19,30 +21,52 @@ class MainActivity : AppCompatActivity() {
 
     private var compositeDisposable: CompositeDisposable = CompositeDisposable()
     private var TAG = "SecondLesson"
-    var observable: Observable<List<String>> = Observable.fromArray(4L,5L,6L,7L,8L)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .map{
-                longToString(it)
-            }.buffer(2)
+    var observable: ConnectableObservable<String> = Observable.interval(1, TimeUnit.SECONDS)
+        .take(6)
+        .subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .map {
+            longToString(it)
+        }.takeUntil { it == "6" }.publish()
 
-    var observer: Observer<List<String>> = object : Observer<List<String>> {
+    var firstObserver: Observer<String> = object : Observer<String> {
         override fun onSubscribe(d: Disposable) {
-            Log.e(TAG, "onSubscribe")
+            Log.e(TAG, "firstObserver onSubscribe")
             compositeDisposable.add(d)
         }
 
         override fun onComplete() {
-            Log.e(TAG, "onComplete")
+            Log.e(TAG, "firstObserver onComplete")
         }
 
-        override fun onNext(t: List<String>) {
-            Log.e(TAG, "onNext")
-            Log.e(TAG, t.toString())
+        override fun onNext(t: String) {
+            Log.e(TAG, "firstObserver onNext")
+            Log.e(TAG, t)
         }
 
         override fun onError(e: Throwable) {
-            Log.e(TAG, "onError")
+            Log.e(TAG, "firstObserver onError")
+        }
+
+    }
+
+    var secondObserver: Observer<String> = object : Observer<String> {
+        override fun onComplete() {
+            Log.e(TAG, "secondObserver onComplete")
+        }
+
+        override fun onSubscribe(d: Disposable) {
+            Log.e(TAG, "secondObserver onSubscribe")
+            compositeDisposable.add(d)
+        }
+
+        override fun onNext(t: String) {
+            Log.e(TAG, "secondObserver onNext")
+            Log.e(TAG, t)
+        }
+
+        override fun onError(e: Throwable) {
+            Log.e(TAG, "secondObserver onError")
         }
 
     }
@@ -52,11 +76,22 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_main)
 
+        Log.e(TAG, "observable connect")
+        observable.connect()
 
-        observable.subscribe(observer)
+        Handler().postDelayed({
+            Log.e(TAG,"subscribing first")
+            observable.subscribe(firstObserver)
+        }, 2200)
+
+        Handler().postDelayed({
+            Log.e(TAG,"subscribing second")
+            observable.subscribe(secondObserver)
+        }, 4200)
+
     }
 
-    fun longToString(number:Long):String{
+    fun longToString(number: Long): String {
         return number.toString()
     }
 }
