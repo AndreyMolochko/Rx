@@ -22,12 +22,12 @@ class MainActivity : AppCompatActivity() {
     private var compositeDisposable: CompositeDisposable = CompositeDisposable()
     private var TAG = "SecondLesson"
     var observable: ConnectableObservable<String> = Observable.interval(1, TimeUnit.SECONDS)
-        .take(6)
+        .take(8)
         .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
         .map {
             longToString(it)
-        }.takeUntil { it == "6" }.publish()
+        }.takeUntil { it == "6" }.replay()
 
     var firstObserver: Observer<String> = object : Observer<String> {
         override fun onSubscribe(d: Disposable) {
@@ -77,15 +77,14 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         Log.e(TAG, "observable connect")
-        observable.connect()
-
         Handler().postDelayed({
-            Log.e(TAG,"subscribing first")
+            Log.e(TAG, "subscribing first")
             observable.subscribe(firstObserver)
         }, 2200)
+        compositeDisposable.add(observable.connect())
 
         Handler().postDelayed({
-            Log.e(TAG,"subscribing second")
+            Log.e(TAG, "subscribing second")
             observable.subscribe(secondObserver)
         }, 4200)
 
