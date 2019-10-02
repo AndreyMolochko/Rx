@@ -14,6 +14,8 @@ import io.reactivex.functions.Action
 import io.reactivex.functions.Function
 import io.reactivex.observables.ConnectableObservable
 import io.reactivex.schedulers.Schedulers
+import io.reactivex.subjects.PublishSubject
+import io.reactivex.subjects.ReplaySubject
 import java.util.concurrent.Callable
 import java.util.concurrent.TimeUnit
 
@@ -21,13 +23,16 @@ class MainActivity : AppCompatActivity() {
 
     private var compositeDisposable: CompositeDisposable = CompositeDisposable()
     private var TAG = "SecondLesson"
-    var observable: ConnectableObservable<String> = Observable.interval(1, TimeUnit.SECONDS)
+    private var observable: Observable<String> = Observable.interval(1, TimeUnit.SECONDS)
         .take(8)
         .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
         .map {
             longToString(it)
-        }.takeUntil { it == "6" }.replay()
+        }
+
+    private var publishSubject: ReplaySubject<String> = ReplaySubject.create()
+
 
     var firstObserver: Observer<String> = object : Observer<String> {
         override fun onSubscribe(d: Disposable) {
@@ -40,8 +45,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         override fun onNext(t: String) {
-            Log.e(TAG, "firstObserver onNext")
-            Log.e(TAG, t)
+            Log.e(TAG, "Observer1 onNext $t")
         }
 
         override fun onError(e: Throwable) {
@@ -61,8 +65,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         override fun onNext(t: String) {
-            Log.e(TAG, "secondObserver onNext")
-            Log.e(TAG, t)
+            Log.e(TAG, "observer2 onNext $t")
         }
 
         override fun onError(e: Throwable) {
@@ -76,17 +79,20 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_main)
 
-        Log.e(TAG, "observable connect")
+        observable.subscribe(publishSubject)
         Handler().postDelayed({
             Log.e(TAG, "subscribing first")
-            observable.subscribe(firstObserver)
+            publishSubject.subscribe(firstObserver)
         }, 2200)
-        compositeDisposable.add(observable.connect())
 
         Handler().postDelayed({
             Log.e(TAG, "subscribing second")
-            observable.subscribe(secondObserver)
+            publishSubject.subscribe(secondObserver)
         }, 4200)
+
+        Handler().postDelayed({
+            publishSubject.onNext("onNext string string string")
+        }, 5200)
 
     }
 
